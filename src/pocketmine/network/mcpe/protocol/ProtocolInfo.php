@@ -38,6 +38,12 @@ interface ProtocolInfo{
 
 	/** Actual Minecraft: PE protocol version */
 	public const CURRENT_PROTOCOL = 475;
+
+	/** Accepted Protocols */
+	public const BEDROCK_1_17_40 = 471;
+	public const ACCEPTED_PROTOCOLS = [self::CURRENT_PROTOCOL, self::BEDROCK_1_17_40];
+	public const ACCEPTED_PROTOCOLS_TO_STRING = [self::CURRENT_PROTOCOL => "-1_18_0", self::BEDROCK_1_17_40 => "-1_17_40"];
+
 	/** Current Minecraft PE version reported by the server. This is usually the earliest currently supported version. */
 	public const MINECRAFT_VERSION = 'v1.18.0';
 	/** Version number sent to clients in ping responses. */

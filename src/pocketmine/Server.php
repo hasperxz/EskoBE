@@ -1848,23 +1848,26 @@ class Server{
 
 		if(count($targets) > 0){
 			$pk = new BatchPacket();
+			foreach($targets as $target){
+				foreach($packets as $p){
+//					$p->clean();
+					$p->protocol = $target->getProtocol();
+					$pk->addPacket($p);
+				}
 
-			foreach($packets as $p){
-				$pk->addPacket($p);
-			}
+				if(Network::$BATCH_THRESHOLD >= 0 and strlen($pk->payload) >= Network::$BATCH_THRESHOLD){
+					$pk->setCompressionLevel($this->networkCompressionLevel);
+				}else{
+					$pk->setCompressionLevel(0); //Do not compress packets under the threshold
+					$forceSync = true;
+				}
 
-			if(Network::$BATCH_THRESHOLD >= 0 and strlen($pk->payload) >= Network::$BATCH_THRESHOLD){
-				$pk->setCompressionLevel($this->networkCompressionLevel);
-			}else{
-				$pk->setCompressionLevel(0); //Do not compress packets under the threshold
-				$forceSync = true;
-			}
-
-			if(!$forceSync and !$immediate and $this->networkCompressionAsync){
-				$task = new CompressBatchedTask($pk, $targets);
-				$this->asyncPool->submitTask($task);
-			}else{
-				$this->broadcastPacketsCallback($pk, $targets, $immediate);
+				if(!$forceSync and !$immediate and $this->networkCompressionAsync){
+					$task = new CompressBatchedTask($pk, $targets);
+					$this->asyncPool->submitTask($task);
+				}else{
+					$this->broadcastPacketsCallback($pk, $targets, $immediate);
+				}
 			}
 		}
 

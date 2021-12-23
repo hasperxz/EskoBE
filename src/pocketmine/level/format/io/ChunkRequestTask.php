@@ -27,6 +27,8 @@ use pocketmine\level\format\Chunk;
 use pocketmine\level\Level;
 use pocketmine\network\mcpe\protocol\BatchPacket;
 use pocketmine\network\mcpe\protocol\LevelChunkPacket;
+use pocketmine\network\mcpe\protocol\ProtocolInfo;
+use pocketmine\Player;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
 use function assert;
@@ -61,8 +63,11 @@ class ChunkRequestTask extends AsyncTask{
 
 	public function onRun(){
 		$chunk = Chunk::fastDeserialize($this->chunk);
-		$pk = LevelChunkPacket::withoutCache($this->chunkX, $this->chunkZ, $chunk->getSubChunkSendCount() + 4, $chunk->networkSerialize($this->tiles));
-
+		if(Player::getProtocol_static() >= ProtocolInfo::BEDROCK_1_17_40){
+			$pk = LevelChunkPacket::withoutCache($this->chunkX, $this->chunkZ, $chunk->getSubChunkSendCount(), $chunk->networkSerialize($this->tiles));
+		}else{
+			$pk = LevelChunkPacket::withoutCache($this->chunkX, $this->chunkZ, $chunk->getSubChunkSendCount() + 4, $chunk->networkSerialize($this->tiles));
+		}
 		$batch = new BatchPacket();
 		$batch->addPacket($pk);
 		$batch->setCompressionLevel($this->compressionLevel);

@@ -24,10 +24,10 @@ declare(strict_types=1);
 namespace pocketmine\network\mcpe\convert;
 
 use pocketmine\block\BlockIds;
-use pocketmine\nbt\NBT;
 use pocketmine\nbt\NetworkLittleEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\NetworkBinaryStream;
+use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\utils\AssumptionFailedError;
 use function file_get_contents;
 use function json_decode;
@@ -49,16 +49,18 @@ final class RuntimeBlockMapping{
 	}
 
 	public static function init() : void{
-		$canonicalBlockStatesFile = file_get_contents(\pocketmine\RESOURCE_PATH . "vanilla/canonical_block_states.nbt");
-		if($canonicalBlockStatesFile === false){
-			throw new AssumptionFailedError("Missing required resource file");
+		foreach(ProtocolInfo::ACCEPTED_PROTOCOLS_TO_STRING as $protocolId => $path){
+			$canonicalBlockStatesFile = file_get_contents(\pocketmine\RESOURCE_PATH . "vanilla/canonical_block_states" . $path . ".nbt");
+			if($canonicalBlockStatesFile === false){
+				throw new AssumptionFailedError("Missing required resource file");
+			}
+			$stream = new NetworkBinaryStream($canonicalBlockStatesFile);
+			$list = [];
+			while(!$stream->feof()){
+				$list[] = $stream->getNbtCompoundRoot();
+			}
+			self::$bedrockKnownStates = $list;
 		}
-		$stream = new NetworkBinaryStream($canonicalBlockStatesFile);
-		$list = [];
-		while(!$stream->feof()){
-			$list[] = $stream->getNbtCompoundRoot();
-		}
-		self::$bedrockKnownStates = $list;
 
 		self::setupLegacyMappings();
 	}

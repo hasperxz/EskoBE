@@ -85,7 +85,9 @@ class SubChunkPacket extends DataPacket{
 			SubChunkPacketHeightMapType::ALL_TOO_LOW => SubChunkPacketHeightMapInfo::allTooLow(),
 			default => throw new \UnexpectedValueException("Unknown heightmap data type $heightMapDataType")
 		};
-		$this->usedBlobHash = $this->getBool() ? $this->getLLong() : null;
+		if($this->protocol >= ProtocolInfo::CURRENT_PROTOCOL){
+			$this->usedBlobHash = $this->getBool() ? $this->getLLong() : null;
+		}
 	}
 
 	protected function encodePayload() : void{
@@ -106,10 +108,12 @@ class SubChunkPacket extends DataPacket{
 			$this->putByte(SubChunkPacketHeightMapType::DATA);
 			$heightMapData->write($this);
 		}
-		$usedBlobHash = $this->usedBlobHash;
-		$this->putBool($usedBlobHash !== null);
-		if($usedBlobHash !== null){
-			$this->putLLong($usedBlobHash);
+		if($this->protocol >= ProtocolInfo::CURRENT_PROTOCOL){
+			$usedBlobHash = $this->usedBlobHash;
+			$this->putBool($usedBlobHash !== null);
+			if($usedBlobHash !== null){
+				$this->putLLong($usedBlobHash);
+			}
 		}
 	}
 

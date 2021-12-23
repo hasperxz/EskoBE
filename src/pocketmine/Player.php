@@ -264,6 +264,8 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 	private const RESERVED_WINDOW_ID_RANGE_END = ContainerIds::LAST;
 	public const HARDCODED_CRAFTING_GRID_WINDOW_ID = self::RESERVED_WINDOW_ID_RANGE_START + 1;
 	public const HARDCODED_INVENTORY_WINDOW_ID = self::RESERVED_WINDOW_ID_RANGE_START + 2;
+	private static int $protocol_ = -1;
+	private $protocol = -1;
 
 	/**
 	 * Validates the given username.
@@ -2006,7 +2008,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 		}
 		$this->seenLoginPacket = true;
 
-		if($packet->protocol !== ProtocolInfo::CURRENT_PROTOCOL){
+		if(!in_array($packet->protocol, ProtocolInfo::ACCEPTED_PROTOCOLS)){
 			if($packet->protocol < ProtocolInfo::CURRENT_PROTOCOL){
 				$this->sendPlayStatus(PlayStatusPacket::LOGIN_FAILED_CLIENT, true);
 			}else{
@@ -2018,6 +2020,9 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 
 			return true;
 		}
+
+		$this->protocol = $packet->protocol;
+		self::$protocol_ = $packet->protocol;
 
 		if(!self::isValidUserName($packet->username)){
 			$this->close("", "disconnectionScreen.invalidName");
@@ -2054,8 +2059,8 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 					$animation["ImageWidth"],
 					base64_decode($animation["Image"], true)),
 				$animation["Type"],
-				$animation["Frames"],
-				$animation["AnimationExpression"]
+				$animation["Frames"] ?? 0,
+				$animation["AnimationExpression"] ?? 0
 			);
 		}
 
@@ -2144,6 +2149,14 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 		}
 
 		return true;
+	}
+
+	public function getProtocol() : int{
+		return $this->protocol;
+	}
+
+	public static function getProtocol_static() : int{
+		return self::$protocol_;
 	}
 
 	/**
