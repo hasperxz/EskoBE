@@ -51,6 +51,7 @@ use pocketmine\network\mcpe\protocol\types\SkinData;
 use pocketmine\network\mcpe\protocol\types\SkinImage;
 use pocketmine\network\mcpe\protocol\types\StructureEditorData;
 use pocketmine\network\mcpe\protocol\types\StructureSettings;
+use pocketmine\Player;
 use pocketmine\utils\BinaryStream;
 use pocketmine\utils\UUID;
 use function assert;
@@ -63,7 +64,12 @@ class NetworkBinaryStream extends BinaryStream{
 	private const DAMAGE_TAG_CONFLICT_RESOLUTION = "___Damage_ProtocolCollisionResolution___";
 	private const PM_META_TAG = "___Meta___";
 
-	public $protocol = -1;
+	public $protocol;
+
+	public function __construct(string $buffer = "", int $offset = 0){
+		$this->protocol = Player::getProtocol_static();
+		parent::__construct($buffer, $offset);
+	}
 
 	public function getString() : string{
 		return $this->get($this->getUnsignedVarInt());
