@@ -267,7 +267,7 @@ class StartGamePacket extends DataPacket{
 		$this->multiplayerCorrelationId = $this->getString();
 		$this->enableNewInventorySystem = $this->getBool();
 		$this->serverSoftwareVersion = $this->getString();
-		if($this->protocol >= ProtocolInfo::CURRENT_PROTOCOL){
+		if($this->protocol >= ProtocolInfo::BEDROCK_1_18_0){
 			$this->blockPaletteChecksum = $this->getLLong();
 		}
 	}
@@ -351,7 +351,7 @@ class StartGamePacket extends DataPacket{
 		$this->putString($this->multiplayerCorrelationId);
 		$this->putBool($this->enableNewInventorySystem);
 		$this->putString($this->serverSoftwareVersion);
-		if($this->protocol >= ProtocolInfo::CURRENT_PROTOCOL){
+		if($this->protocol >= ProtocolInfo::BEDROCK_1_18_0){
 			$this->putLLong($this->blockPaletteChecksum);
 		}
 	}

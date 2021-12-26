@@ -864,7 +864,7 @@ class Chunk{
 		//TODO: HACK! fill in fake subchunks to make up for the new negative space client-side
 		foreach($this->getEntities() as $player){
 			if($player instanceof Player){
-				if($player->getProtocol() >= ProtocolInfo::CURRENT_PROTOCOL){
+				if($player->getProtocol() >= ProtocolInfo::BEDROCK_1_18_0){
 					for($y = 0; $y < 4; ++$y){
 						$result .= chr(8); //subchunk version 8
 						$result .= chr(0); //0 layers - client will treat this as all-air
@@ -879,7 +879,7 @@ class Chunk{
 		//TODO: right now we don't support 3D natively, so we just 3Dify our 2D biomes so they fill the column
 		foreach($this->getEntities() as $player){
 			if($player instanceof Player){
-				if($player->getProtocol() >= ProtocolInfo::CURRENT_PROTOCOL){
+				if($player->getProtocol() >= ProtocolInfo::BEDROCK_1_18_0){
 					$encodedBiomePalette = $this->networkSerializeBiomesAsPalette();
 					$result .= str_repeat($encodedBiomePalette, 25);
 

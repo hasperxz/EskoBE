@@ -264,8 +264,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 	private const RESERVED_WINDOW_ID_RANGE_END = ContainerIds::LAST;
 	public const HARDCODED_CRAFTING_GRID_WINDOW_ID = self::RESERVED_WINDOW_ID_RANGE_START + 1;
 	public const HARDCODED_INVENTORY_WINDOW_ID = self::RESERVED_WINDOW_ID_RANGE_START + 2;
-	private static int $protocol_ = -1;
-	private $protocol = -1;
+	private static int $protocol = -1;
 
 	/**
 	 * Validates the given username.
@@ -2008,7 +2007,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 		}
 		$this->seenLoginPacket = true;
 
-		if(!in_array($packet->protocol, ProtocolInfo::ACCEPTED_PROTOCOLS)){
+		if(!in_array($packet->protocol, ProtocolInfo::ACCEPTED_PROTOCOLS, true)){
 			if($packet->protocol < ProtocolInfo::CURRENT_PROTOCOL){
 				$this->sendPlayStatus(PlayStatusPacket::LOGIN_FAILED_CLIENT, true);
 			}else{
@@ -2021,8 +2020,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 			return true;
 		}
 
-		$this->protocol = $packet->protocol;
-		self::$protocol_ = $packet->protocol;
+		self::$protocol = $packet->protocol;
 
 		if(!self::isValidUserName($packet->username)){
 			$this->close("", "disconnectionScreen.invalidName");
@@ -2152,11 +2150,11 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 	}
 
 	public function getProtocol() : int{
-		return $this->protocol;
+		return self::$protocol;
 	}
 
 	public static function getProtocol_static() : int{
-		return self::$protocol_;
+		return self::$protocol;
 	}
 
 	/**
